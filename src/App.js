@@ -1,64 +1,44 @@
-import React, { Component } from 'react'
-import './assets/style.css'
-import quizservice from './quizService'
-import QuestionBox from './components/QuestionBox'
-import Result from './components/Result'
- class App extends Component {
-   state = {
-     questionBank: [],
-     score: 0,
-     responses: 0
-   };
-   getQuestions = () =>{
-    quizservice().then( question => {
-      this.setState({
-        questionBank: question
-      });
-    });
-   };
+import React from 'react';
+import styles from './App.module.css';
 
-   computeAnswer = (answer, correctAnswer) => {
-      if(answer === correctAnswer){
-        this.setstate({
-          score: this.state.score +1
-        });
-      }
-      this.setstate({
-        responses: this.state.responses < 5 ? this.state.responses + 1 : 5
-      });
-   }
-   playAgain = () => {
-     this.getQuestions();
-     this.setState({
-       score: 0 ,
-       responses: 0
-     })
-   }
+class App extends React.Component {
 
-   componentDidMount(){
-     this.getQuestions();
-   }
+  constructor(props) {
+    super(props);
+    this.state = {value: ''};
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    let name = localStorage.setItem("name", this.state.value);
+    window.location = '/quiz';
+  }
+
+  handleAdminSubmit(event){
+    event.preventDefault();
+    window.location = "/login";
+  }
+
   render() {
     return (
-      <div className="container">
-        <div className = "title">Quiz</div>
-        {this.state.questionBank.length > 0 && 
-        this.state.responses < 5  &&
-        this.state.questionBank.map(({question, asnwers,
-          correct, questionId}) => (
-            <QuestionBox 
-            question = {question} 
-            options = {asnwers} 
-            key = {questionId}
-            selected = {answer => this.computeAnswer(answer, correct)}
-            />
-          ) 
-          )}
-          {this.state.responses === 5 ? (<Result score = {this.state.score}
-                                                 playAgain = {this.playAgain}  
-                                           />)  : null}
-      </div>
-    )
+      <div className={styles.subscribe_box}>
+        <h2>Welcome to the Quiz</h2>
+        <h3>created by Gajanan</h3>
+        <form className={styles.subscribe} onSubmit={this.handleSubmit}>
+          <input type="text" placeholder="Your name or nickname" autocomplete="off" required="required" value={this.state.value} onChange={this.handleChange}/>
+          <button type="submit"> <span>Start</span></button>
+        </form>
+        <a onClick={this.handleAdminSubmit} className={styles.btn_admin}>Are you admin?</a>
+    </div>
+    );
   }
 }
+
 export default App;
